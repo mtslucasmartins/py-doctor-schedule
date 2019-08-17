@@ -15,6 +15,15 @@ class ProviderObject(graphene.ObjectType):
     description = graphene.String()
 
 
+class HealthPlanObject(graphene.ObjectType):
+
+    id = graphene.ID()
+
+    description = graphene.String()
+
+    provider = graphene.Field(ProviderObject)
+
+
 class ExamTypeObject(graphene.ObjectType):
     id = graphene.ID()
     description = graphene.String()
@@ -45,10 +54,7 @@ class UserObject(graphene.ObjectType):
     reset_password_key = graphene.String()
     reset_password_key_validity = graphene.Date()
 
-    organizations = graphene.List(OrganizationObject)
-    locations     = graphene.List(LocationObject)
-    providers     = graphene.List(ProviderObject)
-    exam_types    = graphene.List(ExamTypeObject)
+    organization = graphene.Field(OrganizationObject)
 
 
 # ]

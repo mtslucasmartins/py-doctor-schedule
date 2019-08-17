@@ -14,6 +14,7 @@ from database import db
 
 
 from graphql_schemas.mutations.create_provider import CreateProvider
+from graphql_schemas.mutations.create_provider import CreateHealthPlan
 
 
 class CreateLocation(graphene.Mutation):
@@ -25,7 +26,7 @@ class CreateLocation(graphene.Mutation):
     @jwt_required
     def mutate(self, info, **args):
         current_user = User.find_by_email(get_jwt_identity())
-        location = Location(description=args.get("description"), user=current_user)
+        location = Location(description=args.get("description"), organization=current_user.organization)
         location.save()
         return CreateLocation(location=location)
 
@@ -39,7 +40,7 @@ class CreateExamType(graphene.Mutation):
     @jwt_required
     def mutate(self, info, **args):
         current_user = User.find_by_email(get_jwt_identity())
-        examType = ExamType(description=args.get("description"), user=current_user)
+        examType = ExamType(description=args.get("description"), organization=current_user.organization)
         examType.save()
         return CreateExamType(examType=examType)
 
@@ -74,3 +75,4 @@ class Mutation(graphene.ObjectType):
     create_location = CreateLocation.Field()
     create_exam_type = CreateExamType.Field()
     create_provider = CreateProvider.Field()
+    create_health_plan = CreateHealthPlan.Field()

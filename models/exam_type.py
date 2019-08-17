@@ -8,8 +8,8 @@ class ExamType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
 
-    fk_users_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    user = db.relationship("User", foreign_keys="ExamType.fk_users_id")
+    fk_organizations_id = db.Column(db.Integer, db.ForeignKey("organizations.id"), nullable=False)
+    organization = db.relationship("Organization", foreign_keys="ExamType.fk_organizations_id")
 
     def save(self):
         try:

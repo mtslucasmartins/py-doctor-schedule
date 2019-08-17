@@ -8,13 +8,17 @@ class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
 
-    fk_users_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    user = db.relationship("User", foreign_keys="Location.fk_users_id")
+    fk_organizations_id = db.Column(
+        db.Integer, db.ForeignKey("organizations.id"), nullable=False
+    )
+    organization = db.relationship(
+        "Organization", foreign_keys="Location.fk_organizations_id"
+    )
 
     def __init__(self, *args, **kwargs):
         self.id = None
         self.description = kwargs.get("description", None)
-        self.user = kwargs.get("user", None)
+        self.organization = kwargs.get("organization", None)
 
         if self.description is None:
             raise Exception("Informe a descrição do local!")
@@ -41,6 +45,11 @@ class Location(db.Model):
             "city": self.city,
             "state": self.state,
         }
+
+    @classmethod
+    def find_by_id(cls, id):
+        return db.session.query(cls).filter(cls.id == id).first()
+
 
     @classmethod
     def resolve_locations(cls, **kwargs):

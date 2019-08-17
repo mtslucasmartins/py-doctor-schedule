@@ -20,6 +20,7 @@ from graphql_schemas import schema
 from libs.strings import gettext
 
 from resources import auth as auth_resource
+from resources import signup as signup_resource
 
 # app initialization
 app = Flask(__name__)
@@ -113,6 +114,9 @@ app.add_url_rule(
 # RESTful Endpoints.
 api.add_resource(auth_resource.AuthAccessToken, "/auth/token")
 api.add_resource(auth_resource.AuthRefreshToken, "/auth/refresh")
+
+# 
+api.add_resource(signup_resource.SignUp, "/register")
 
 
 if __name__ == "__main__":

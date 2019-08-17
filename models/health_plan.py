@@ -2,17 +2,14 @@ import bcrypt
 from database import db
 
 
-class Provider(db.Model):
-    __tablename__ = "providers"
+class HealthPlan(db.Model):
+    __tablename__ = "health_plans"
 
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
 
-    # fk_users_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    # user = db.relationship("User", foreign_keys="Provider.fk_users_id")
-
-    fk_organizations_id = db.Column(db.Integer, db.ForeignKey("organizations.id"), nullable=False)
-    organization = db.relationship("Organization", foreign_keys="Provider.fk_organizations_id")
+    fk_providers_id = db.Column(db.Integer, db.ForeignKey("providers.id"), nullable=False)
+    provider = db.relationship("Provider", foreign_keys="HealthPlan.fk_providers_id")
 
     def save(self):
         try:
@@ -24,7 +21,7 @@ class Provider(db.Model):
             raise Exception("Ocorreu um erro ao inserir local de atendimento!")
 
     def delete(self):
-        db.session.query(Provider.id == self.id).delete()
+        db.session.query(HealthPlan.id == self.id).delete()
         db.session.commit()
 
     def json(self):
@@ -38,29 +35,29 @@ class Provider(db.Model):
         }
 
     @classmethod
-    def find_by_id(cls, id):
-        return db.session.query(cls).filter(cls.id == id).first()
-
-
-    @classmethod
-    def resolve_provider(cls, **kwargs):
-        query = db.session.query(Provider)
+    def resolve_health_plan(cls, **kwargs):
+        query = db.session.query(cls)
         id = kwargs.get("id")
-        return query.filter(Provider.id == id).first()
+        return query.filter(cls.id == id).first()
 
     @classmethod
-    def resolve_providers(cls, **kwargs):
-        query = db.session.query(Provider)
-        id, description, page_index, page_size = (
+    def resolve_health_plans(cls, **kwargs):
+        query = db.session.query(cls)
+        id, description, provider_id, page_index, page_size = (
             kwargs.get("id"),
             kwargs.get("l_description"),
+            kwargs.get("provider_id"),
             kwargs.get("page_index", 0),
             kwargs.get("page_size", 10),
         )
         if id is not None:
-            query = query.filter(Provider.id == id)
+            query = query.filter(cls.id == id)
+            
+        if provider_id is not None:
+            query = query.filter(cls.fk_providers_id == provider_id)
+
         if description is not None:
-            query = query.filter(Provider.description.like(f"%{description}%"))
+            query = query.filter(cls.description.like(f"%{description}%"))
 
         return query.offset(page_index * page_size).limit(page_size)
 

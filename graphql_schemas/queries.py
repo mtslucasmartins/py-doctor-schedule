@@ -8,6 +8,7 @@ from graphql_schemas.objects import (
     LocationObject,
     ProviderObject,
     ExamTypeObject,
+    HealthPlanObject
 )
 
 from database import db
@@ -15,6 +16,7 @@ from database import db
 from models.user import User
 from models.locations import Location
 from models.provider import Provider
+from models.health_plan import HealthPlan
 from models.exam_type import ExamType
 from models.organization import Organization
 
@@ -53,6 +55,16 @@ class Query(graphene.ObjectType):
         lambda: graphene.List(ProviderObject),
         id=graphene.Int(),
         l_description=graphene.String(),
+        page_index=graphene.Int(),
+        page_size=graphene.Int(),
+    )
+
+    health_plan = graphene.Field(HealthPlanObject, id=graphene.Int())
+    health_plans = graphene.Field(
+        lambda: graphene.List(HealthPlanObject),
+        id=graphene.Int(),
+        l_description=graphene.String(),
+        provider_id=graphene.Int(),
         page_index=graphene.Int(),
         page_size=graphene.Int(),
     )
@@ -108,7 +120,21 @@ class Query(graphene.ObjectType):
 
     @jwt_required
     def resolve_providers(self, info, **args):
+        current_user = User.find_by_email(get_jwt_identity())
         return Provider.resolve_providers(**args)
+
+    # -----------------------------------------------------
+    # HEALTH PLANS
+    # -----------------------------------------------------
+    @jwt_required
+    def resolve_health_plan(self, info, **args):
+        return HealthPlan.resolve_health_plan(**args)
+
+    @jwt_required
+    def resolve_health_plans(self, info, **args):
+        current_user = User.find_by_email(get_jwt_identity())
+        return HealthPlan.resolve_health_plans(**args)
+
 
     # -----------------------------------------------------
     # EXAM TYPES

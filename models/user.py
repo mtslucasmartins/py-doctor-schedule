@@ -1,14 +1,12 @@
 import bcrypt
 import json
+import time
 from datetime import datetime
 
 from database import db, Base
 from libs.cpf import CPFValidator
 
 from models.organization import Organization
-from models.users_organizations import UserOrganization
-from models.locations import Location
-
 
 class User(db.Model):
     __tablename__ = "users"
@@ -17,24 +15,15 @@ class User(db.Model):
     cpf = db.Column(db.String(256), index=True, unique=True)
     email = db.Column(db.String(256), index=True, unique=True)
     username = db.Column(db.String(256), index=True, unique=True)
-    username2 = db.Column(db.String(256), index=True, unique=True)
 
     fullname = db.Column(db.String(256))
     password = db.Column(db.String(256))
 
-    created_at = db.Column(db.Date())
-    updated_at = db.Column(db.Date())
+    created_at = db.Column(db.DateTime())
+    updated_at = db.Column(db.DateTime())
 
-    reset_password_key = db.Column(db.String(256))
-    reset_password_key_validity = db.Column(db.Date())
-
-    organizations = db.relationship(
-        "Organization", secondary="users_organizations", uselist=True, backref="user"
-    )
-
-    locations = db.relationship("Location", uselist=True)
-    providers = db.relationship("Provider", uselist=True)
-    exam_types = db.relationship("ExamType", uselist=True)
+    fk_organizations_id = db.Column(db.Integer, db.ForeignKey("organizations.id"), nullable=False)
+    organization = db.relationship("Organization", foreign_keys="User.fk_organizations_id")
 
     def __init__(self, *args, **kwargs):
         self.id = None
@@ -42,12 +31,9 @@ class User(db.Model):
         self.email = kwargs.get("email", None)
         self.fullname = kwargs.get("fullname", None)
         self.username = kwargs.get("username", None)
-        self.username2 = kwargs.get("username2", None)
         self.password = kwargs.get("password", None)
-        self.created_at = kwargs.get("created_at", datetime.now())
-        self.updated_at = kwargs.get("updated_at", datetime.now())
-        self.organizations = kwargs.get("organizations", [])
-        self.locations = kwargs.get("locations", [])
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
         self.reset_password_key = None
         self.reset_password_key_validity = None
 
@@ -67,9 +53,41 @@ class User(db.Model):
             "email": self.email,
             "fullname": self.fullname,
             "username": self.username,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
+            "created_at": time.mktime(self.created_at.timetuple()) * 1e3
+            + self.created_at.microsecond / 1e3,
+            "updated_at": time.mktime(self.updated_at.timetuple()) * 1e3
+            + self.updated_at.microsecond / 1e3,
         }
+
+    @classmethod
+    def check_cpf(cls, cpf):
+        return CPFValidator(cpf).valid()
+
+    @classmethod
+    def hash_password(cls, password):
+        return bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt()).decode("utf8")
+
+    @classmethod
+    def check_password(cls, password, hash):
+        return bcrypt.checkpw(password.encode("utf8"), hash.encode("utf8"))
+
+    def register(self):
+        cpf_check = True  # User.check_cpf(self.cpf)
+
+        if cpf_check:
+            self.password = User.hash_password(self.password)
+
+            organization = Organization(cpf_cnpj=self.cpf, description=self.fullname)
+            organization.save()
+            self.organization = organization
+            self.fk_organizations_id = organization.id
+
+            # creates an User.
+            db.session.add(self)
+            db.session.commit()
+
+        else:
+            raise Exception("CPF Inválido!")
 
     def save(self):
         cpf_check = User.check_cpf(self.cpf)
@@ -87,21 +105,25 @@ class User(db.Model):
         else:
             raise Exception("CPF Inválido!")
 
+    # ---------------------------------------------------------------------------------------------
+    # Queries.
+    # ---------------------------------------------------------------------------------------------
+    @classmethod
+    def find_by_cpf(cls, cpf):
+        return db.session.query(User).filter(User.cpf == cpf).first()
+
     @classmethod
     def find_by_email(cls, email):
         return db.session.query(User).filter(User.email == email).first()
 
+    # ---------------------------------------------------------------------------------------------
+    # GraphQL Resolvers.
+    # ---------------------------------------------------------------------------------------------
     @classmethod
-    def check_cpf(cls, cpf):
-        return CPFValidator(cpf).valid()
-
-    @classmethod
-    def hash_password(cls, password):
-        return bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt()).decode("utf8")
-
-    @classmethod
-    def check_password(cls, password, hash):
-        return bcrypt.checkpw(password.encode("utf8"), hash.encode("utf8"))
+    def resolve_user(cls, **kwargs):
+        query = db.session.query(User)
+        uuid = kwargs.get("uuid")
+        return query.get(uuid)
 
     @classmethod
     def resolve_users(cls, **kwargs):
@@ -114,10 +136,3 @@ class User(db.Model):
         if id is not None:
             user_query = user_query.filter(User.id == id)
         return user_query.offset(page_index * page_size).limit(page_size)
-
-    @classmethod
-    def resolve_user(cls, **kwargs):
-        query = db.session.query(User)
-        uuid = kwargs.get("uuid")
-        return query.get(uuid)
-

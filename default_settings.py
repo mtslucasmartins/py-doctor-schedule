@@ -6,9 +6,10 @@ SECRET_KEY = os.urandom(24)
 HOST = os.environ.get('HOST', '0.0.0.0')
 PORT = os.environ.get('PORT', 5000)
 
+DEV_DATABASE = 'postgres://jzhmhjsctmarpn:bd2133f05cd0655ecb5d59da2bea46c6470391d98978f352fade1f8cbd0565ef@ec2-75-101-147-226.compute-1.amazonaws.com:5432/dk0hsvd2jciu'
 
 # Database
-SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI', 'sqlite:///app.db')
+SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI', DEV_DATABASE)
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_ECHO = True
 
