@@ -8,7 +8,8 @@ from graphql_schemas.objects import (
     LocationObject,
     ProviderObject,
     ExamTypeObject,
-    HealthPlanObject
+    HealthPlanObject,
+    ExamObject,
 )
 
 from database import db
@@ -19,6 +20,7 @@ from models.provider import Provider
 from models.health_plan import HealthPlan
 from models.exam_type import ExamType
 from models.organization import Organization
+from models.exam import Exam
 
 
 class Query(graphene.ObjectType):
@@ -74,6 +76,14 @@ class Query(graphene.ObjectType):
         lambda: graphene.List(ExamTypeObject),
         id=graphene.Int(),
         l_description=graphene.String(),
+        page_index=graphene.Int(),
+        page_size=graphene.Int(),
+    )
+
+    exam = graphene.Field(ExamObject, uuid=graphene.Int())
+    exams = graphene.Field(
+        lambda: graphene.List(ExamObject),
+        id=graphene.Int(),
         page_index=graphene.Int(),
         page_size=graphene.Int(),
     )
@@ -135,7 +145,6 @@ class Query(graphene.ObjectType):
         current_user = User.find_by_email(get_jwt_identity())
         return HealthPlan.resolve_health_plans(**args)
 
-
     # -----------------------------------------------------
     # EXAM TYPES
     # -----------------------------------------------------
@@ -146,3 +155,15 @@ class Query(graphene.ObjectType):
     @jwt_required
     def resolve_exam_types(self, info, **args):
         return ExamType.resolve_exam_types(**args)
+
+    # -----------------------------------------------------
+    # EXAMS
+    # -----------------------------------------------------
+    @jwt_required
+    def resolve_exam(self, info, **args):
+        return Exam.resolve_exam(**args)
+
+    @jwt_required
+    def resolve_exams(self, info, **args):
+        return Exam.resolve_exams(**args)
+

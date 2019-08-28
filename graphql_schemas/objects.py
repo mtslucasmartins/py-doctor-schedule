@@ -20,6 +20,8 @@ class HealthPlanObject(graphene.ObjectType):
     id = graphene.ID()
 
     description = graphene.String()
+    days_for_receipt = graphene.Int()
+    cut_off_day = graphene.Int()
 
     provider = graphene.Field(ProviderObject)
 
@@ -62,12 +64,15 @@ class ExamObject(graphene.ObjectType):
     
     description = graphene.String()
     photo_url = graphene.String()
+    procedute_code = graphene.String()
+    date_for_receipt = graphene.Date()
+    cut_off_date = graphene.Date()
 
     location = graphene.Field(LocationObject)
     exam_type = graphene.Field(ExamTypeObject)
     provider = graphene.Field(ProviderObject)
     health_plan = graphene.Field(HealthPlanObject)
-    organization = graphene.Field(OrganizationObject)
+    user = graphene.Field(UserObject)
 
     created_at = graphene.Date()
     updated_at = graphene.Date()

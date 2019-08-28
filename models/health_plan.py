@@ -7,9 +7,16 @@ class HealthPlan(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
+    
+    # dias para recebimento
+    days_for_receipt = db.Column(db.Integer(), nullable=True)
+
+    # data/dia de corte
+    cut_off_day = db.Column(db.Integer(), nullable=True)
 
     fk_providers_id = db.Column(db.Integer, db.ForeignKey("providers.id"), nullable=False)
     provider = db.relationship("Provider", foreign_keys="HealthPlan.fk_providers_id")
+
 
     def save(self):
         try:
@@ -35,6 +42,10 @@ class HealthPlan(db.Model):
         }
 
     @classmethod
+    def find_by_id(cls, id):
+        return db.session.query(cls).filter(cls.id == id).first()
+
+    @classmethod
     def resolve_health_plan(cls, **kwargs):
         query = db.session.query(cls)
         id = kwargs.get("id")
@@ -43,6 +54,9 @@ class HealthPlan(db.Model):
     @classmethod
     def resolve_health_plans(cls, **kwargs):
         query = db.session.query(cls)
+
+    
+
         id, description, provider_id, page_index, page_size = (
             kwargs.get("id"),
             kwargs.get("l_description"),

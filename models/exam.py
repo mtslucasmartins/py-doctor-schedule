@@ -8,9 +8,14 @@ class Exam(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     
     description = db.Column(db.String(), nullable=False)
+
     photo_url = db.Column(db.String(), nullable=False)
 
-    procedure_code = db.Column(db.String(), nullable=False)
+    procedure_code = db.Column(db.String(), nullable=True)
+
+    date_for_receipt = db.Column(db.Date())
+
+    cut_off_date = db.Column(db.Date())
 
     fk_exam_types_id = db.Column(db.Integer, db.ForeignKey("exam_types.id"), nullable=False)
     exam_type = db.relationship("ExamType", foreign_keys="Exam.fk_exam_types_id")
@@ -23,6 +28,9 @@ class Exam(db.Model):
 
     fk_health_plans_id = db.Column(db.Integer, db.ForeignKey("health_plans.id"), nullable=False)
     health_plan = db.relationship("HealthPlan", foreign_keys="Exam.fk_health_plans_id")
+    
+    fk_users_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user = db.relationship("User", foreign_keys="Exam.fk_users_id")
 
     created_at = db.Column(db.DateTime())
     updated_at = db.Column(db.DateTime())
@@ -51,7 +59,7 @@ class Exam(db.Model):
         }
 
     @classmethod
-    def resolve_exam_types(cls, **kwargs):
+    def resolve_exams(cls, **kwargs):
         query = db.session.query(Exam)
         id, description, page_index, page_size = (
             kwargs.get("id"),
@@ -68,7 +76,7 @@ class Exam(db.Model):
         return query.offset(page_index * page_size).limit(page_size)
 
     @classmethod
-    def resolve_exam_type(cls, **kwargs):
+    def resolve_exam(cls, **kwargs):
         query = db.session.query(Exam)
         id = kwargs.get("id")
         return query.filter(Exam.id == id).first()

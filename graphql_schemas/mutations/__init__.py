@@ -15,6 +15,7 @@ from database import db
 
 from graphql_schemas.mutations.create_provider import CreateProvider
 from graphql_schemas.mutations.create_provider import CreateHealthPlan
+from graphql_schemas.mutations.create_exam import CreateExam
 
 
 class CreateLocation(graphene.Mutation):
@@ -76,3 +77,4 @@ class Mutation(graphene.ObjectType):
     create_exam_type = CreateExamType.Field()
     create_provider = CreateProvider.Field()
     create_health_plan = CreateHealthPlan.Field()
+    create_exam = CreateExam.Field()

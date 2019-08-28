@@ -35,6 +35,11 @@ class ExamType(db.Model):
         }
 
     @classmethod
+    def find_by_id(cls, id):
+        return db.session.query(cls).filter(cls.id == id).first()
+
+
+    @classmethod
     def resolve_exam_types(cls, **kwargs):
         query = db.session.query(ExamType)
         id, description, page_index, page_size = (
