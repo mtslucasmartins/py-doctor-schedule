@@ -64,7 +64,7 @@ class ExamObject(graphene.ObjectType):
     
     description = graphene.String()
     photo_url = graphene.String()
-    procedute_code = graphene.String()
+    procedure_code = graphene.String()
     date_for_receipt = graphene.Date()
     cut_off_date = graphene.Date()
 
