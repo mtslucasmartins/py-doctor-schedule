@@ -56,17 +56,18 @@ class UserObject(graphene.ObjectType):
 
     organization = graphene.Field(OrganizationObject)
 
+class ExamObject(graphene.ObjectType):
 
-# ]
-#
-##
-# class UserObject(SQLAlchemyObjectType):
-#     class Meta:
-#         model = User
-#         interfaces = (graphene.relay.Node,)
+    id = graphene.ID()
+    
+    description = graphene.String()
+    photo_url = graphene.String()
 
+    location = graphene.Field(LocationObject)
+    exam_type = graphene.Field(ExamTypeObject)
+    provider = graphene.Field(ProviderObject)
+    health_plan = graphene.Field(HealthPlanObject)
+    organization = graphene.Field(OrganizationObject)
 
-# class OrganizationObject(SQLAlchemyObjectType):
-#     class Meta:
-#         model = Organization
-#         interfaces = (graphene.relay.Node,)
+    created_at = graphene.Date()
+    updated_at = graphene.Date()
