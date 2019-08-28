@@ -114,6 +114,7 @@ app.add_url_rule(
 # RESTful Endpoints.
 api.add_resource(auth_resource.AuthAccessToken, "/auth/token")
 api.add_resource(auth_resource.AuthRefreshToken, "/auth/refresh")
+api.add_resource(auth_resource.AuthCheckToken, "/auth/check_token")
 
 # 
 api.add_resource(signup_resource.SignUp, "/register")

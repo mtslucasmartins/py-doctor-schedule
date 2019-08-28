@@ -19,8 +19,30 @@ def parse_auth_token_args():
     return parser.parse_args()
 
 
+class AuthCheckToken(Resource):
+
+    @jwt_required
+    def get(self):
+        current_user = User.find_by_email(get_jwt_identity())
+
+        if not current_user:
+            return (
+                {
+                    "description": gettext("security_invalid_credentials"),
+                    "error": "invalid_credentials",
+                },
+                401,
+            )
+
+        return (
+            current_user.json(),
+            200,
+        )
+
+
 class AuthAccessToken(Resource):
     def post(self):
+        current_user = get_jwt_identity()
         request_args = parse_auth_token_args()
 
         username = request_args.get("username")
