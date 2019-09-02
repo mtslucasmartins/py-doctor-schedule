@@ -18,7 +18,7 @@ class HealthPlan(db.Model):
     provider = db.relationship("Provider", foreign_keys="HealthPlan.fk_providers_id")
     
     fk_organizations_id = db.Column(db.Integer, db.ForeignKey("organizations.id"), nullable=False)
-    organization = db.relationship("Organization", foreign_keys="Provider.fk_organizations_id")
+    organization = db.relationship("Organization", foreign_keys="HealthPlan.fk_organizations_id")
 
     def save(self):
         try:
