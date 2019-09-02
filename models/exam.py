@@ -85,13 +85,13 @@ class Exam(db.Model):
             query = query.filter(Exam.id == id)
 
         if provider_id is not None:
-            query = query.filter(cls.fk_providers_id == id)
+            query = query.filter(cls.fk_providers_id == provider_id)
 
         if location_id is not None:
-            query = query.filter(cls.fk_locations_id == id)
+            query = query.filter(cls.fk_locations_id == location_id)
 
         if exam_type_id is not None:
-            query = query.filter(cls.fk_exam_types_id == id)
+            query = query.filter(cls.fk_exam_types_id == exam_type_id)
 
         
         if begin is not None:

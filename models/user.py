@@ -134,7 +134,7 @@ class User(db.Model):
             kwargs.get("page_index", 0),
             kwargs.get("page_size", 10),
         )
-        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
+        user_query = user_query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
         if id is not None:
             user_query = user_query.filter(User.id == id)
         return user_query.offset(page_index * page_size).limit(page_size)

@@ -89,8 +89,8 @@ class Query(graphene.ObjectType):
         provider_id=graphene.Int(),
         location_id=graphene.Int(),
         #
-        begin=graphene.Date(),
-        end=graphene.Date(),
+        begin=graphene.DateTime(),
+        end=graphene.DateTime(),
         #
         page_index=graphene.Int(),
         page_size=graphene.Int(),

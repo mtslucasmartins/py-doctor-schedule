@@ -74,5 +74,5 @@ class ExamObject(graphene.ObjectType):
     health_plan = graphene.Field(HealthPlanObject)
     user = graphene.Field(UserObject)
 
-    created_at = graphene.Date()
-    updated_at = graphene.Date()
+    created_at = graphene.DateTime()
+    updated_at = graphene.DateTime()
