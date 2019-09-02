@@ -8,9 +8,6 @@ class Provider(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
 
-    # fk_users_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    # user = db.relationship("User", foreign_keys="Provider.fk_users_id")
-
     fk_organizations_id = db.Column(db.Integer, db.ForeignKey("organizations.id"), nullable=False)
     organization = db.relationship("Organization", foreign_keys="Provider.fk_organizations_id")
 
@@ -43,13 +40,14 @@ class Provider(db.Model):
 
 
     @classmethod
-    def resolve_provider(cls, **kwargs):
+    def resolve_provider(cls, authorized_user, **kwargs):
         query = db.session.query(Provider)
+        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
         id = kwargs.get("id")
         return query.filter(Provider.id == id).first()
 
     @classmethod
-    def resolve_providers(cls, **kwargs):
+    def resolve_providers(cls, authorized_user, **kwargs):
         query = db.session.query(Provider)
         id, description, page_index, page_size = (
             kwargs.get("id"),
@@ -57,6 +55,9 @@ class Provider(db.Model):
             kwargs.get("page_index", 0),
             kwargs.get("page_size", 10),
         )
+    
+        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
+
         if id is not None:
             query = query.filter(Provider.id == id)
         if description is not None:

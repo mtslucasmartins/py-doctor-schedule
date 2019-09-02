@@ -38,16 +38,22 @@ class ExamType(db.Model):
     def find_by_id(cls, id):
         return db.session.query(cls).filter(cls.id == id).first()
 
-
+    # -----------------------------------------------------
+    # GRAPHQL
+    # -----------------------------------------------------
     @classmethod
-    def resolve_exam_types(cls, **kwargs):
-        query = db.session.query(ExamType)
+    def resolve_exam_types(cls, authorized_user, **kwargs):
         id, description, page_index, page_size = (
             kwargs.get("id"),
             kwargs.get("l_description"),
             kwargs.get("page_index", 0),
             kwargs.get("page_size", 10),
         )
+        
+        query = db.session.query(ExamType)
+
+        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
+
         if id is not None:
             query = query.filter(ExamType.id == id)
 
@@ -57,7 +63,9 @@ class ExamType(db.Model):
         return query.offset(page_index * page_size).limit(page_size)
 
     @classmethod
-    def resolve_exam_type(cls, **kwargs):
+    def resolve_exam_type(cls, authorized_user, **kwargs):
         query = db.session.query(ExamType)
+        
+        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
         id = kwargs.get("id")
         return query.filter(ExamType.id == id).first()

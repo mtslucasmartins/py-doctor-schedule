@@ -58,15 +58,22 @@ class Exam(db.Model):
             "state": self.state,
         }
 
+    # -----------------------------------------------------
+    # GRAPHQL
+    # -----------------------------------------------------
     @classmethod
-    def resolve_exams(cls, **kwargs):
+    def resolve_exams(cls, authorizedUser, **kwargs):
         query = db.session.query(Exam)
+
         id, description, page_index, page_size = (
             kwargs.get("id"),
             kwargs.get("l_description"),
             kwargs.get("page_index", 0),
             kwargs.get("page_size", 10),
         )
+
+        query = query.filter(cls.fk_users_id == authorizedUser.id)
+
         if id is not None:
             query = query.filter(Exam.id == id)
 
@@ -76,7 +83,8 @@ class Exam(db.Model):
         return query.offset(page_index * page_size).limit(page_size)
 
     @classmethod
-    def resolve_exam(cls, **kwargs):
+    def resolve_exam(cls, authorizedUser, **kwargs):
         query = db.session.query(Exam)
+        query = query.filter(cls.fk_users_id == authorizedUser.id)
         id = kwargs.get("id")
         return query.filter(Exam.id == id).first()

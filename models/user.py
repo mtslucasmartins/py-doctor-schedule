@@ -120,19 +120,21 @@ class User(db.Model):
     # GraphQL Resolvers.
     # ---------------------------------------------------------------------------------------------
     @classmethod
-    def resolve_user(cls, **kwargs):
+    def resolve_user(cls, authorized_user, **kwargs):
         query = db.session.query(User)
+        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
         uuid = kwargs.get("uuid")
         return query.get(uuid)
 
     @classmethod
-    def resolve_users(cls, **kwargs):
+    def resolve_users(cls, authorized_user, **kwargs):
         user_query = db.session.query(User)
         id, page_index, page_size = (
             kwargs.get("id"),
             kwargs.get("page_index", 0),
             kwargs.get("page_size", 10),
         )
+        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
         if id is not None:
             user_query = user_query.filter(User.id == id)
         return user_query.offset(page_index * page_size).limit(page_size)

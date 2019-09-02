@@ -93,77 +93,89 @@ class Query(graphene.ObjectType):
     # -----------------------------------------------------
     @jwt_required
     def resolve_user(self, info, **args):
-        return User.resolve_user(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return User.resolve_user(current_user, **args)
 
     @jwt_required
     def resolve_users(self, info, **args):
-        return User.resolve_users(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return User.resolve_users(current_user, **args)
 
     # -----------------------------------------------------
     # ORGANIZATIONS
     # -----------------------------------------------------
     @jwt_required
     def resolve_organization(self, info, **args):
-        return Organization.resolve_organization(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return Organization.resolve_organization(current_user, **args)
 
     @jwt_required
     def resolve_organizations(self, info, **args):
-        return Organization.resolve_organizations(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return Organization.resolve_organizations(current_user, **args)
 
     # -----------------------------------------------------
     # LOCATIONS
     # -----------------------------------------------------
     @jwt_required
     def resolve_location(self, info, **args):
-        return Location.resolve_location(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return Location.resolve_location(current_user, **args)
 
     @jwt_required
     def resolve_locations(self, info, **args):
-        return Location.resolve_locations(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return Location.resolve_locations(current_user, **args)
 
     # -----------------------------------------------------
     # PROVIDERS
     # -----------------------------------------------------
     @jwt_required
     def resolve_provider(self, info, **args):
-        return Provider.resolve_provider(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return Provider.resolve_provider(current_user, **args)
 
     @jwt_required
     def resolve_providers(self, info, **args):
         current_user = User.find_by_email(get_jwt_identity())
-        return Provider.resolve_providers(**args)
+        return Provider.resolve_providers(current_user, **args)
 
     # -----------------------------------------------------
     # HEALTH PLANS
     # -----------------------------------------------------
     @jwt_required
     def resolve_health_plan(self, info, **args):
-        return HealthPlan.resolve_health_plan(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return HealthPlan.resolve_health_plan(current_user, **args)
 
     @jwt_required
     def resolve_health_plans(self, info, **args):
         current_user = User.find_by_email(get_jwt_identity())
-        return HealthPlan.resolve_health_plans(**args)
+        return HealthPlan.resolve_health_plans(current_user, **args)
 
     # -----------------------------------------------------
     # EXAM TYPES
     # -----------------------------------------------------
     @jwt_required
     def resolve_exam_type(self, info, **args):
-        return ExamType.resolve_exam_type(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return ExamType.resolve_exam_type(current_user, **args)
 
     @jwt_required
     def resolve_exam_types(self, info, **args):
-        return ExamType.resolve_exam_types(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return ExamType.resolve_exam_types(current_user, **args)
 
     # -----------------------------------------------------
     # EXAMS
     # -----------------------------------------------------
     @jwt_required
     def resolve_exam(self, info, **args):
-        return Exam.resolve_exam(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return Exam.resolve_exam(current_user, **args)
 
     @jwt_required
     def resolve_exams(self, info, **args):
-        return Exam.resolve_exams(**args)
+        current_user = User.find_by_email(get_jwt_identity())
+        return Exam.resolve_exams(current_user, **args)
 

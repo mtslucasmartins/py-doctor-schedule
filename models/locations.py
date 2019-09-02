@@ -52,7 +52,7 @@ class Location(db.Model):
 
 
     @classmethod
-    def resolve_locations(cls, **kwargs):
+    def resolve_locations(cls, authorized_user, **kwargs):
         query = db.session.query(Location)
         id, description, page_index, page_size = (
             kwargs.get("id"),
@@ -60,6 +60,7 @@ class Location(db.Model):
             kwargs.get("page_index", 0),
             kwargs.get("page_size", 10),
         )
+        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
         if id is not None:
             query = query.filter(Location.id == id)
         if description is not None:
@@ -67,7 +68,8 @@ class Location(db.Model):
         return query.offset(page_index * page_size).limit(page_size)
 
     @classmethod
-    def resolve_location(cls, **kwargs):
+    def resolve_location(cls, authorized_user, **kwargs):
         query = db.session.query(Location)
+        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
         id = kwargs.get("id")
         return query.filter(Location.id == id).first()

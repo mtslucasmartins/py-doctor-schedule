@@ -46,13 +46,14 @@ class HealthPlan(db.Model):
         return db.session.query(cls).filter(cls.id == id).first()
 
     @classmethod
-    def resolve_health_plan(cls, **kwargs):
+    def resolve_health_plan(cls, authorized_user, **kwargs):
         query = db.session.query(cls)
         id = kwargs.get("id")
+        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
         return query.filter(cls.id == id).first()
 
     @classmethod
-    def resolve_health_plans(cls, **kwargs):
+    def resolve_health_plans(cls, authorized_user, **kwargs):
         query = db.session.query(cls)
 
     
@@ -64,6 +65,9 @@ class HealthPlan(db.Model):
             kwargs.get("page_index", 0),
             kwargs.get("page_size", 10),
         )
+        
+        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
+
         if id is not None:
             query = query.filter(cls.id == id)
             
