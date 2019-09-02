@@ -66,7 +66,7 @@ class HealthPlan(db.Model):
             kwargs.get("page_size", 10),
         )
         
-        query = query.filter(cls.fk_organizations_id == authorized_user.fk_organizations_id)
+        query = query.filter(cls.provider.fk_organizations_id == authorized_user.fk_organizations_id)
 
         if id is not None:
             query = query.filter(cls.id == id)
