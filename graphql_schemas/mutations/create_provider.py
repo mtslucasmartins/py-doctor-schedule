@@ -49,7 +49,7 @@ class CreateHealthPlan(Mutation):
         provider = Provider.find_by_id(args.get("provider_id"))
 
         health_plan = HealthPlan(
-            description=args.get("description"), provider=provider
+            description=args.get("description"), provider=provider, organization=current_user.organization
         )
         health_plan.save()
 
