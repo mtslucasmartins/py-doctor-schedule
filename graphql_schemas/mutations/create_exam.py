@@ -15,6 +15,8 @@ from models.provider import Provider
 from models.health_plan import HealthPlan
 from models.exam import Exam
 
+from datetime import datetime
+
 
 class CreateExam(Mutation):
     """ GraphQL Mutation for creating a Provider. """
@@ -63,6 +65,8 @@ class CreateExam(Mutation):
             health_plan=health_plan,
             #
             user=current_user,
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
         exam.save()
 

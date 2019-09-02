@@ -72,10 +72,35 @@ class Exam(db.Model):
             kwargs.get("page_size", 10),
         )
 
+        provider_id = kwargs.get("provider_id");
+        location_id = kwargs.get("location_id");
+        exam_type_id = kwargs.get("exam_type_id");
+
+        begin = kwargs.get("begin");
+        end = kwargs.get("end");
+
         query = query.filter(cls.fk_users_id == authorizedUser.id)
 
         if id is not None:
             query = query.filter(Exam.id == id)
+
+        if provider_id is not None:
+            query = query.filter(cls.fk_providers_id == id)
+
+        if location_id is not None:
+            query = query.filter(cls.fk_locations_id == id)
+
+        if exam_type_id is not None:
+            query = query.filter(cls.fk_exam_types_id == id)
+
+        
+        if begin is not None:
+            query = query.filter(cls.created_at >= begin)
+
+        
+        if end is not None:
+            query = query.filter(cls.created_at <= end)
+
 
         if description is not None:
             query = query.filter(Exam.description.like(f"%{description}%"))

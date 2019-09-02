@@ -84,9 +84,32 @@ class Query(graphene.ObjectType):
     exams = graphene.Field(
         lambda: graphene.List(ExamObject),
         id=graphene.Int(),
+        #
+        exam_type_id=graphene.Int(),
+        provider_id=graphene.Int(),
+        location_id=graphene.Int(),
+        #
+        begin=graphene.Date(),
+        end=graphene.Date(),
+        #
         page_index=graphene.Int(),
         page_size=graphene.Int(),
     )
+
+    # pending_exams = graphene.Field(
+    #     lambda: graphene.List(ExamObject),
+    #     #
+    #     exam_type_id=graphene.Int(),
+    #     provider_id=graphene.Int(),
+    #     location_id=graphene.Int(),
+    #     #
+    #     begin=graphene.Date(),
+    #     end=graphene.Date(),
+    #     #
+    #     page_index=graphene.Int(),
+    #     page_size=graphene.Int(),
+    # )
+
 
     # -----------------------------------------------------
     # USERS
