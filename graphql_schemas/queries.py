@@ -10,6 +10,7 @@ from graphql_schemas.objects import (
     ExamTypeObject,
     HealthPlanObject,
     ExamObject,
+    ExamItemObject
 )
 
 from database import db
@@ -103,9 +104,9 @@ class Query(graphene.ObjectType):
     )
 
 
-    exam_item = graphene.Field(ExamObject, uuid=graphene.Int())
+    exam_item = graphene.Field(ExamItemObject, uuid=graphene.Int())
     exam_items = graphene.Field(
-        lambda: graphene.List(ExamObject),
+        lambda: graphene.List(ExamItemObject),
         id=graphene.Int(),
         #
         procedure_code=graphene.String(),
