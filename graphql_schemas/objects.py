@@ -76,3 +76,15 @@ class ExamObject(graphene.ObjectType):
 
     created_at = graphene.DateTime()
     updated_at = graphene.DateTime()
+
+
+class ExamItemObject(graphene.ObjectType):
+    id = graphene.ID()
+
+    procedure_code = graphene.String()
+    cost = graphene.Float()
+
+    exam = graphene.Field(ExamObject)
+
+    created_at = graphene.DateTime()
+    updated_at = graphene.DateTime()

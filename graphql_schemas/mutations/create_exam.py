@@ -1,7 +1,8 @@
 # GraphQL
-from graphene import Mutation, Field, String, Int, Date
+from graphene import Mutation, Field, String, Int, Date, Float
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
-from graphql_schemas.objects import ExamObject
+
+from graphql_schemas.objects import ExamObject, ExamItemObject
 
 # Authentication
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -14,6 +15,7 @@ from models.provider import Provider
 from models.provider import Provider
 from models.health_plan import HealthPlan
 from models.exam import Exam
+from models.exam_item import ExamItem
 
 from datetime import datetime
 
@@ -71,4 +73,41 @@ class CreateExam(Mutation):
         exam.save()
 
         return CreateExam(exam=exam)
+
+
+class CreateExamItem(Mutation):
+    """ GraphQL Mutation for creating a Provider. """
+
+    class Arguments:
+        procedure_code = String(required=False)
+        cost = Float(required=False)
+        exam_id = Int(required=True)
+
+    exam_item = Field(lambda: ExamItemObject)
+
+    @jwt_required
+    def mutate(self, info, **args):
+        current_user = User.find_by_email(get_jwt_identity())
+
+        print(args)
+        print(args.get("exam_id"))
+
+        procedure_code = args.get("procedure_code")
+        cost = args.get("cost")
+        exam = Exam.find_by_id(args.get("exam_id"))
+
+        print(exam.json())
+
+
+        exam_item = ExamItem(
+            procedure_code=procedure_code,
+            cost=cost,
+            exam=exam,
+            fk_exams_id=args.get("exam_id"),
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
+        exam_item.save()
+
+        return CreateExamItem(exam_item=exam_item)
 

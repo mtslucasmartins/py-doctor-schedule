@@ -1,6 +1,8 @@
 import bcrypt
 from database import db
+from sqlalchemy import or_
 
+from models.exam_item import ExamItem
 
 class Exam(db.Model):
     __tablename__ = "exams"
@@ -28,6 +30,8 @@ class Exam(db.Model):
 
     fk_health_plans_id = db.Column(db.Integer, db.ForeignKey("health_plans.id"), nullable=False)
     health_plan = db.relationship("HealthPlan", foreign_keys="Exam.fk_health_plans_id")
+
+    items = db.relationship("ExamItem", uselist=True)
     
     fk_users_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     user = db.relationship("User", foreign_keys="Exam.fk_users_id")
@@ -50,13 +54,13 @@ class Exam(db.Model):
 
     def json(self):
         return {
-            "id": self.id,
-            "name": self.name,
-            "cnpj": self.cnpj,
-            "address": self.address,
-            "city": self.city,
-            "state": self.state,
+            "id": self.id
         }
+    
+    @classmethod
+    def find_by_id(cls, id):
+        return db.session.query(cls).filter(cls.id == id).first()
+
 
     # -----------------------------------------------------
     # GRAPHQL
@@ -113,3 +117,24 @@ class Exam(db.Model):
         query = query.filter(cls.fk_users_id == authorizedUser.id)
         id = kwargs.get("id")
         return query.filter(Exam.id == id).first()
+
+    @classmethod
+    def resolve_pending_exams(cls, authorizedUser, **kwargs):
+
+        page_index, page_size = (
+            kwargs.get("page_index", 0),
+            kwargs.get("page_size", 10),
+        )
+
+        query = db.session.query(cls) \
+            .outerjoin(cls.items)
+
+        query = query.filter(cls.fk_users_id == authorizedUser.id)
+
+        # Exames sem data para recebimento, exames sem data de corte, exames com procedimentos sem custo definido
+        query = query.filter(or_(
+            cls.date_for_receipt == None, 
+            cls.cut_off_date == None, 
+            ExamItem.cost == None))
+
+        return query.offset(page_index * page_size).limit(page_size)

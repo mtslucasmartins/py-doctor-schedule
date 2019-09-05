@@ -21,6 +21,7 @@ from models.health_plan import HealthPlan
 from models.exam_type import ExamType
 from models.organization import Organization
 from models.exam import Exam
+from models.exam_item import ExamItem
 
 
 class Query(graphene.ObjectType):
@@ -80,6 +81,11 @@ class Query(graphene.ObjectType):
         page_size=graphene.Int(),
     )
 
+    pending_exams = graphene.Field(
+        lambda: graphene.List(ExamObject), uuid=graphene.Int(),
+        page_index=graphene.Int(),
+        page_size=graphene.Int())
+
     exam = graphene.Field(ExamObject, uuid=graphene.Int())
     exams = graphene.Field(
         lambda: graphene.List(ExamObject),
@@ -96,6 +102,18 @@ class Query(graphene.ObjectType):
         page_size=graphene.Int(),
     )
 
+
+    exam_item = graphene.Field(ExamObject, uuid=graphene.Int())
+    exam_items = graphene.Field(
+        lambda: graphene.List(ExamObject),
+        id=graphene.Int(),
+        #
+        procedure_code=graphene.String(),
+        exam_id=graphene.Int(),
+        #
+        page_index=graphene.Int(),
+        page_size=graphene.Int(),
+    )
     # pending_exams = graphene.Field(
     #     lambda: graphene.List(ExamObject),
     #     #
@@ -193,6 +211,11 @@ class Query(graphene.ObjectType):
     # EXAMS
     # -----------------------------------------------------
     @jwt_required
+    def resolve_pending_exams(self, info, **args):
+        current_user = User.find_by_email(get_jwt_identity())
+        return Exam.resolve_pending_exams(current_user, **args)
+
+    @jwt_required
     def resolve_exam(self, info, **args):
         current_user = User.find_by_email(get_jwt_identity())
         return Exam.resolve_exam(current_user, **args)
@@ -202,3 +225,16 @@ class Query(graphene.ObjectType):
         current_user = User.find_by_email(get_jwt_identity())
         return Exam.resolve_exams(current_user, **args)
 
+
+    # -----------------------------------------------------
+    # EXAM ITEMS
+    # -----------------------------------------------------
+    @jwt_required
+    def resolve_exam_item(self, info, **args):
+        current_user = User.find_by_email(get_jwt_identity())
+        return ExamItem.resolve_exam_item(current_user, **args)
+
+    @jwt_required
+    def resolve_exam_items(self, info, **args):
+        current_user = User.find_by_email(get_jwt_identity())
+        return ExamItem.resolve_exam_items(current_user, **args)
